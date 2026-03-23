@@ -3,7 +3,7 @@
     <button
       class="layout-btn"
       :class="{ active: modelValue === 'side-by-side' }"
-      title="Wide: 幅の中央で左右分割（SBS）"
+      :title="t.wideTip"
       :disabled="disabled"
       @click="emit('update:modelValue', 'side-by-side')"
     >
@@ -15,7 +15,7 @@
     <button
       class="layout-btn"
       :class="{ active: modelValue === 'over-under' }"
-      title="Portrait: 高さの中央で上下分割（O/U）"
+      :title="t.portraitTip"
       :disabled="disabled"
       @click="emit('update:modelValue', 'over-under')"
     >
@@ -29,6 +29,8 @@
 
 <script setup lang="ts">
 import type { StereoLayout } from '../types'
+import { useI18n } from '../composables/useI18n'
+const { t } = useI18n()
 defineProps<{ modelValue: StereoLayout; disabled?: boolean }>()
 const emit = defineEmits<{ 'update:modelValue': [v: StereoLayout] }>()
 </script>

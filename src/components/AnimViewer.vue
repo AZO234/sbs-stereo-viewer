@@ -11,10 +11,10 @@
         @click="saveGif"
       >
         <span v-if="exporting !== 'gif'">
-          <i class="bi bi-file-earmark-play me-1" />GIFで保存
+          <i class="bi bi-file-earmark-play me-1" />{{ t.saveGif }}
         </span>
         <span v-else class="export-progress">
-          <span class="spinner" />GIF… {{ Math.round(progress * 100) }}%
+          <span class="spinner" />{{ t.encodingGif }} {{ Math.round(progress * 100) }}%
         </span>
       </button>
       <!-- WebP -->
@@ -24,10 +24,10 @@
         @click="saveWebp"
       >
         <span v-if="exporting !== 'webp'">
-          <i class="bi bi-file-earmark-image me-1" />WebPで保存
+          <i class="bi bi-file-earmark-image me-1" />{{ t.saveWebp }}
         </span>
         <span v-else class="export-progress">
-          <span class="spinner" />WebP… {{ Math.round(progress * 100) }}%
+          <span class="spinner" />{{ t.encodingWebp }} {{ Math.round(progress * 100) }}%
         </span>
       </button>
     </div>
@@ -39,6 +39,8 @@ import { ref, watch, onMounted, onUnmounted } from 'vue'
 import type { StereoImage, StretchMode } from '../types'
 import { useAnimPlayer } from '../composables/useAnimPlayer'
 import { exportGif, downloadBlob } from '../composables/useGifExport'
+import { useI18n } from '../composables/useI18n'
+const { t } = useI18n()
 import { saveAnimWebp } from '../composables/useWebpExport'
 
 const props = defineProps<{
@@ -87,7 +89,7 @@ async function saveGif() {
     downloadBlob(blob, `${base}_anim.gif`)
   } catch (e) {
     console.error('GIF export failed:', e)
-    alert('GIF書き出しに失敗しました: ' + (e instanceof Error ? e.message : String(e)))
+    alert(t.value.gifError + (e instanceof Error ? e.message : String(e)))
   } finally {
     exporting.value = null
     // 再生を再開
@@ -113,7 +115,7 @@ async function saveWebp() {
     )
   } catch (e) {
     console.error('WebP export failed:', e)
-    alert('WebP書き出しに失敗しました: ' + (e instanceof Error ? e.message : String(e)))
+    alert(t.value.webpError + (e instanceof Error ? e.message : String(e)))
   } finally {
     exporting.value = null
     if (wasPlaying && canvasEl.value)

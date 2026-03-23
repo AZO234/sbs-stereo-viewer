@@ -5,8 +5,10 @@
       :dim-info="dimInfo"
       :is-dark="isDark"
       :font-size="fontSize"
+      :locale="locale"
       @update:is-dark="isDark = $event"
       @update:font-size="fontSize = $event"
+      @update:locale="setLocale($event)"
     />
     <!-- 右下固定の著作権表示 -->
     <div class="sv-copyright">©AZO</div>
@@ -17,13 +19,13 @@
 
         <div v-if="!stereo && !loading" class="empty-state">
           <div class="empty-icon">🎞️</div>
-          <p>JPS / PNS ファイルを読み込んでください</p>
-          <p class="empty-sub">サイドバイサイド形式の立体画像に対応</p>
+          <p>{{ t.loadPrompt }}</p>
+          <p class="empty-sub">{{ t.sbs }}</p>
         </div>
 
         <div v-else-if="loading" class="empty-state">
           <div class="sv-spinner" />
-          <p>読み込み中...</p>
+          <p>{{ t.loading }}</p>
         </div>
 
         <template v-else-if="stereo">
@@ -61,7 +63,7 @@
 
         <!-- File Drop -->
         <section>
-          <PanelTitle>ファイル</PanelTitle>
+          <PanelTitle>{{ t.file }}</PanelTitle>
           <DropZone @file="onFile" />
           <div v-if="error" class="sv-error mt-2">
             <i class="bi bi-exclamation-triangle me-1" />{{ error }}
@@ -70,38 +72,38 @@
 
         <!-- 分割方法 -->
         <section>
-          <PanelTitle>分割方法</PanelTitle>
+          <PanelTitle>{{ t.splitMethod }}</PanelTitle>
           <LayoutToggle v-model="splitLayout" :disabled="!stereo" />
         </section>
 
         <!-- Mode Tabs -->
         <section>
-          <PanelTitle>表示モード</PanelTitle>
+          <PanelTitle>{{ t.viewMode }}</PanelTitle>
           <div class="mode-tabs">
-            <button class="mode-tab" :class="{ active: mode === 'anim' }"  @click="setMode('anim')">アニメ式</button>
-            <button class="mode-tab" :class="{ active: mode === 'fixed' }" @click="setMode('fixed')">固定式</button>
+            <button class="mode-tab" :class="{ active: mode === 'anim' }"  @click="setMode('anim')">{{ t.animMode }}</button>
+            <button class="mode-tab" :class="{ active: mode === 'fixed' }" @click="setMode('fixed')">{{ t.fixedMode }}</button>
           </div>
         </section>
 
         <!-- 表示倍率（共通） -->
         <section>
-          <PanelTitle>表示倍率</PanelTitle>
+          <PanelTitle>{{ t.stretch }}</PanelTitle>
           <StretchToggle v-model="stretchMode" />
           <p class="stretch-hint">{{ stretchHint }}</p>
         </section>
 
         <!-- Anim Controls -->
         <section v-show="mode === 'anim'">
-          <PanelTitle>アニメ設定</PanelTitle>
+          <PanelTitle>{{ t.animSettings }}</PanelTitle>
           <div class="ctrl-group">
             <SliderRow
-              label="切替速度"
+              :label="t.speed"
               v-model="animSpeed"
               :min="50" :max="2000" :step="50"
               :display-value="`${animSpeed} ms`"
             />
             <SliderRow
-              label="画像サイズ"
+              :label="t.imageSize"
               v-model="animScalePct"
               :min="20" :max="200" :step="5"
               :display-value="`${animScalePct} %`"
@@ -113,22 +115,22 @@
               @click="togglePlay"
             >
               <span class="dot" />
-              <span>{{ animPlaying ? '停止' : '再生' }}</span>
+              <span>{{ animPlaying ? t.stop : t.play }}</span>
             </button>
           </div>
         </section>
 
         <!-- Fixed Controls -->
         <section v-show="mode === 'fixed'">
-          <PanelTitle>固定式設定</PanelTitle>
+          <PanelTitle>{{ t.fixedSettings }}</PanelTitle>
           <div class="ctrl-group">
             <SliderRow
-              label="画像サイズ"
+              :label="t.imageSize"
               v-model="fixedScalePct"
               :min="20" :max="200" :step="5"
               :display-value="`${fixedScalePct} %`"
             />
-            <ToggleRow label="左右入れ替え" v-model="swapped" />
+            <ToggleRow :label="t.swap" v-model="swapped" />
           </div>
         </section>
 
@@ -140,6 +142,8 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import type { ViewMode, StretchMode, StereoLayout } from './types'
+import { useI18n } from './composables/useI18n'
+import type { Locale } from './composables/useI18n'
 import { useAutoScale } from './composables/useAutoScale'
 import type { FontSize } from './components/FontSizeToggle.vue'
 import { useStereoLoader } from './composables/useStereoLoader'
@@ -151,9 +155,14 @@ import SliderRow     from './components/SliderRow.vue'
 import ToggleRow     from './components/ToggleRow.vue'
 import StretchToggle   from './components/StretchToggle.vue'
 import LayoutToggle    from './components/LayoutToggle.vue'
+import LocaleToggle    from './components/LocaleToggle.vue'
 import AnimViewer    from './components/AnimViewer.vue'
 import FixedViewer   from './components/FixedViewer.vue'
 import StatusBar     from './components/StatusBar.vue'
+
+// ── i18n ─────────────────────────────────────────────────────
+const { locale, t, setLocale, initLocale } = useI18n()
+initLocale()
 
 // ── Theme ────────────────────────────────────────────────────
 const isDark = ref(true)
@@ -203,9 +212,9 @@ watch(stereo, (s) => {
 
 const stretchHint = computed(() => {
   switch (stretchMode.value) {
-    case 'Wx2': return '1眼 → 全幅へ引き伸ばし'
-    case 'x1':  return '1眼をそのまま等倍表示'
-    case 'Hx2': return '1眼 → 全高へ引き伸ばし'
+    case 'Wx2': return t.value.stretchWx2
+    case 'x1':  return t.value.stretchX1
+    case 'Hx2': return t.value.stretchHx2
   }
 })
 

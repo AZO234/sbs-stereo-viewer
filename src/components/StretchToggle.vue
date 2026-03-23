@@ -5,7 +5,7 @@
       :key="m.value"
       class="stretch-btn"
       :class="{ active: modelValue === m.value }"
-      :title="m.title"
+:title="t[m.titleKey]"
       @click="emit('update:modelValue', m.value)"
     >{{ m.label }}</button>
   </div>
@@ -13,14 +13,16 @@
 
 <script setup lang="ts">
 import type { StretchMode } from '../types'
+import { useI18n } from '../composables/useI18n'
+const { t } = useI18n()
 
 defineProps<{ modelValue: StretchMode }>()
 const emit = defineEmits<{ 'update:modelValue': [v: StretchMode] }>()
 
-const modes: { value: StretchMode; label: string; title: string }[] = [
-  { value: 'Wx2', label: 'W×2', title: '1眼を元の全幅に引き伸ばす（SBS 16:9向け）' },
-  { value: 'x1',  label: '×1',  title: '1眼をそのまま等倍表示（SBS 32:9向け）' },
-  { value: 'Hx2', label: 'H×2', title: '1眼を元の全高に引き伸ばす（O/U向け）' },
+const modes: { value: StretchMode; label: string; titleKey: 'stretchWx2Tip' | 'stretchX1Tip' | 'stretchHx2Tip' }[] = [
+  { value: 'Wx2' as StretchMode, label: 'W×2', titleKey: 'stretchWx2Tip' as const },
+  { value: 'x1'  as StretchMode, label: '×1',  titleKey: 'stretchX1Tip'  as const },
+  { value: 'Hx2' as StretchMode, label: 'H×2', titleKey: 'stretchHx2Tip' as const },
 ]
 </script>
 

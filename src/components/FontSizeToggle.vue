@@ -5,9 +5,9 @@
       :key="s.value"
       class="fs-btn"
       :class="{ active: modelValue === s.value }"
-      :aria-label="`文字サイズ${s.label}`"
+      :aria-label="t.fontSizeLabel(t[s.labelKey])"
       @click="emit('update:modelValue', s.value)"
-    >{{ s.label }}</button>
+    >{{ t[s.labelKey] }}</button>
   </div>
 </template>
 
@@ -17,11 +17,13 @@ export type FontSize = 'sm' | 'md' | 'lg'
 defineProps<{ modelValue: FontSize }>()
 const emit = defineEmits<{ 'update:modelValue': [v: FontSize] }>()
 
-const sizes: { value: FontSize; label: string }[] = [
-  { value: 'sm', label: '小' },
-  { value: 'md', label: '中' },
-  { value: 'lg', label: '大' },
+const sizes: { value: FontSize; labelKey: 'fontSm' | 'fontMd' | 'fontLg' }[] = [
+  { value: 'sm' as FontSize, labelKey: 'fontSm' as const },
+  { value: 'md' as FontSize, labelKey: 'fontMd' as const },
+  { value: 'lg' as FontSize, labelKey: 'fontLg' as const },
 ]
+import { useI18n } from '../composables/useI18n'
+const { t } = useI18n()
 </script>
 
 <style scoped>

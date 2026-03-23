@@ -3,14 +3,14 @@
     <div class="fixed-wrap">
       <div class="eye-frame">
         <span class="eye-label" :class="swapped ? 'right' : 'left'">
-          {{ swapped ? 'RIGHT → LEFT' : 'LEFT' }}
+          {{ swapped ? t.leftSwapped : t.leftLabel }}
         </span>
         <canvas ref="canvasL" class="eye-canvas" />
       </div>
       <div class="divider" />
       <div class="eye-frame">
         <span class="eye-label" :class="swapped ? 'left' : 'right'">
-          {{ swapped ? 'LEFT → RIGHT' : 'RIGHT' }}
+          {{ swapped ? t.rightSwapped : t.rightLabel }}
         </span>
         <canvas ref="canvasR" class="eye-canvas" />
       </div>
@@ -24,10 +24,10 @@
         @click="savePng"
       >
         <span v-if="!exporting">
-          <i class="bi bi-file-earmark-image me-1" />PNGで保存
+          <i class="bi bi-file-earmark-image me-1" />{{ t.savePng }}
         </span>
         <span v-else class="export-progress">
-          <span class="spinner" />保存中…
+          <span class="spinner" />{{ t.saving }}
         </span>
       </button>
     </div>
@@ -38,6 +38,8 @@
 import { ref, watch, onMounted } from 'vue'
 import type { StereoImage, StretchMode } from '../types'
 import { canvasSize } from '../composables/useAnimPlayer'
+import { useI18n } from '../composables/useI18n'
+const { t } = useI18n()
 import { exportPng } from '../composables/usePngExport'
 
 const props = defineProps<{
@@ -70,7 +72,7 @@ async function savePng() {
     await exportPng(props.stereo, props.scale, props.stretch, props.swapped)
   } catch (e) {
     console.error('PNG export failed:', e)
-    alert('PNG書き出しに失敗しました: ' + (e instanceof Error ? e.message : String(e)))
+    alert(t.value.pngError + (e instanceof Error ? e.message : String(e)))
   } finally {
     exporting.value = false
   }

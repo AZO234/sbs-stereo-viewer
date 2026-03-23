@@ -1,6 +1,8 @@
 <script setup lang="ts">
 defineProps<{ modelValue: boolean }>()
 defineEmits<{ 'update:modelValue': [boolean] }>()
+import { useI18n } from '../composables/useI18n'
+const { t } = useI18n()
 </script>
 
 <template>
@@ -8,7 +10,7 @@ defineEmits<{ 'update:modelValue': [boolean] }>()
     class="tog"
     :class="{ dark: modelValue }"
     @click="$emit('update:modelValue', !modelValue)"
-    :aria-label="modelValue ? 'ライトモードへ' : 'ダークモードへ'"
+    :aria-label="modelValue ? t.toLight : t.toDark"
   >
     <!-- トラック背景 -->
     <div class="tog__track">

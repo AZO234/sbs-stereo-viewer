@@ -17,8 +17,8 @@
     <div class="drop-icon">📂</div>
     <!-- スマホではドラッグ&ドロップ非対応のため文言を変える -->
     <p class="drop-hint">
-      <span class="no-touch">クリックまたはドロップ</span>
-      <span class="touch-only">タップして選択</span>
+      <span class="no-touch">{{ t.dropOrClick }}</span>
+      <span class="touch-only">{{ t.tapToSelect }}</span>
     </p>
     <div class="ext-row">
       <span class="ext-badge">.jps</span>
@@ -30,6 +30,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from '../composables/useI18n'
+const { t } = useI18n()
 
 const emit = defineEmits<{ file: [f: File] }>()
 const inputEl    = ref<HTMLInputElement | null>(null)

@@ -28,12 +28,17 @@
         <span class="sep">|</span>
         <span class="diminfo">{{ dimInfo }}</span>
       </div>
-      <!-- 文字サイズ切替（左） -->
+      <!-- 言語切替 -->
+      <LocaleToggle
+        :model-value="locale"
+        @update:model-value="emit('update:locale', $event)"
+      />
+      <!-- 文字サイズ切替 -->
       <FontSizeToggle
         :model-value="fontSize"
         @update:model-value="emit('update:fontSize', $event)"
       />
-      <!-- ライト/ダーク切替（右） -->
+      <!-- ライト/ダーク切替 -->
       <ThemeToggle
         :model-value="isDark"
         @update:model-value="emit('update:isDark', $event)"
@@ -43,20 +48,24 @@
 </template>
 
 <script setup lang="ts">
-import ThemeToggle from './ThemeToggle.vue'
+import ThemeToggle   from './ThemeToggle.vue'
 import FontSizeToggle from './FontSizeToggle.vue'
+import LocaleToggle  from './LocaleToggle.vue'
 import type { FontSize } from './FontSizeToggle.vue'
+import type { Locale }   from '../composables/useI18n'
 
 defineProps<{
   fileName?: string
   dimInfo?:  string
   isDark:    boolean
   fontSize:  FontSize
+  locale:    Locale
 }>()
 
 const emit = defineEmits<{
   'update:isDark':   [v: boolean]
   'update:fontSize': [v: FontSize]
+  'update:locale':   [v: Locale]
 }>()
 </script>
 
@@ -100,13 +109,11 @@ small {
   color: var(--text-muted);
   margin-top: 3px;
 }
-
 .sv-header-right {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
-
 .sv-header-meta {
   display: flex;
   align-items: center;
@@ -115,7 +122,6 @@ small {
   font-size: 0.7rem;
   color: var(--text-muted);
 }
-
 .sns-bar {
   display: flex; flex-wrap: wrap; align-items: center;
   justify-content: center; gap: 0.5rem;
