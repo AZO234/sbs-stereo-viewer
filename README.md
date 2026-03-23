@@ -4,6 +4,8 @@
 
 # STEREO VIEWER — JPS/PNS Stereoscopic Image Browser
 
+[<img src="public/screenshots/wide.png" width="960" alt="wide screenshot">]
+
 Vue 3 + TypeScript + Vite + Bootstrap 5 製の立体画像ビューアです。
 
 ## 動作要件

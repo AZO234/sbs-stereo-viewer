@@ -1,3 +1,12 @@
+/* ─── FONT SCALE ─────────────────────────────────────────────
+   html の font-size を切り替えることで全 rem 値が連動する。
+   小: 10px  中: 15px (現在の×1.5)  大: 20px
+──────────────────────────────────────────────────────────── */
+html { font-size: 20px; }                 /* デフォルト: 中 */
+html[data-font="sm"] { font-size: 16px; }
+html[data-font="md"] { font-size: 20px; }
+html[data-font="lg"] { font-size: 24px; }
+
 /* ─── DESIGN TOKENS — DARK (default) ────────────────────────── */
 :root {
   --bg:        #0a0c10;

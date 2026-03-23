@@ -6,7 +6,6 @@
     <div class="item">SCALE: <span>{{ scale }}</span></div>
     <div class="item" v-if="layout">LAYOUT: <span>{{ layout }}</span></div>
     <div class="item" v-if="stretch">STRETCH: <span>{{ stretch }}</span></div>
-    <div class="copy">©AZO</div>
   </div>
 </template>
 
@@ -30,7 +29,7 @@ defineProps<{
   padding: 0.3rem 1.25rem;
   font-family: var(--mono);
   font-size: 0.62rem;
-  color: var(--text-muted);
+  color: var(--text);
   display: flex;
   gap: 2rem;
   letter-spacing: 0.05em;
@@ -38,5 +37,4 @@ defineProps<{
 }
 .item { display: flex; gap: 0.4rem; align-items: center; }
 .item span { color: var(--accent); }
-.copy { margin-left: auto; color: var(--text-muted); opacity: 0.5; letter-spacing: 0.05em; }
 </style>

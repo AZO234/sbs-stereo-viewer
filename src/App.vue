@@ -4,8 +4,14 @@
       :file-name="stereo?.fileName"
       :dim-info="dimInfo"
       :is-dark="isDark"
+      :font-size="fontSize"
       @update:is-dark="isDark = $event"
+      @update:font-size="fontSize = $event"
     />
+    <!-- 右下固定の著作権表示 -->
+    <div class="sv-copyright">
+      ©AZO
+    </div>
 
     <div class="sv-body">
       <!-- ── MAIN（左：画像ビューア） ── -->
@@ -130,6 +136,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import type { ViewMode, StretchMode } from './types'
+import type { FontSize } from './components/FontSizeToggle.vue'
 import { useStereoLoader } from './composables/useStereoLoader'
 
 import AppHeader     from './components/AppHeader.vue'
@@ -146,6 +153,12 @@ import StatusBar     from './components/StatusBar.vue'
 const isDark = ref(true)
 watch(isDark, (dark) => {
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+}, { immediate: true })
+
+// ── Font size ─────────────────────────────────────────────────
+const fontSize = ref<FontSize>('md')
+watch(fontSize, (s) => {
+  document.documentElement.setAttribute('data-font', s)
 }, { immediate: true })
 
 // ── Stereo loader ─────────────────────────────────────────────
@@ -265,6 +278,26 @@ const dimInfo = computed(() => {
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .sv-error { font-size: 0.72rem; color: var(--accent2); background: rgba(255,61,107,0.08); border: 1px solid rgba(255,61,107,0.3); border-radius: var(--radius); padding: 0.4rem 0.6rem; }
+
+.sv-copyright {
+  position: fixed;
+  bottom: 2.2rem; /* StatusBar の上 */
+  right: 0.8rem;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  opacity: 0.45;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.sns-bar {
+  display: flex; flex-wrap: wrap; align-items: center;
+  justify-content: center; gap: 0.5rem;
+  padding: 0.4rem 0.5rem; margin-bottom: 0.4rem;
+}
+.sns-bar img { display: block; }
 
 @media (max-width: 768px) {
   .sv-body { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
