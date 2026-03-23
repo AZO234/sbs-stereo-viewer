@@ -33,7 +33,6 @@ export async function exportGif(
 
     gif.on('progress', (p: number) => onProgress?.(p))
     gif.on('finished', (blob: Blob) => resolve(blob))
-    gif.on('error',    (err: unknown) => reject(err))
     gif.render()
   })
 }
