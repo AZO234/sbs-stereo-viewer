@@ -1,3 +1,7 @@
+[<img src="images/typescript.svg" width="64" alt="TypeScript icon">](https://www.typescriptlang.org/ja/) [<img src="images/vite.svg" width="64" alt="Vite.js icon">](https://ja.vite.dev/) [<img src="images/vue.svg" width="64" alt="Vue.js icon">](https://ja.vuejs.org/) [<img src="images/bootstrap.svg" width="64" alt="Bootstrap icon">](https://getbootstrap.jp/)
+
+[![BuyMeACoffee](https://img.shields.io/badge/-Buy%20Me%20a%20Coffee-ffdd00?style=flat-square&logo=buymeacoffee&logoColor=black)](https://coff.ee/azo234)
+
 # STEREO VIEWER
 
 [![Deploy to GitHub Pages](https://github.com/AZO234/stereo-viewer/actions/workflows/deploy.yml/badge.svg)](https://github.com/AZO234/stereo-viewer/actions/workflows/deploy.yml)
@@ -7,6 +11,7 @@
 立体画像（JPS/PNS）の擬似閲覧ウェブビューアです。Vue 3 + TypeScript + Bootstrap 5 で作られています。
 
 ![スクリーンショット](public/screenshots/wide.png)
+![WebPサンプル](public/sample.webp)
 
 ## 機能
 
@@ -98,10 +103,6 @@ src/
 ```
 
 ## 技術スタック
-
-[![Vue.js](images/vue.svg)](https://vuejs.org/)
-[![TypeScript](images/typescript.svg)](https://www.typescriptlang.org/)
-[![Bootstrap](images/bootstrap.svg)](https://getbootstrap.com/)
 
 - [Vue 3](https://vuejs.org/) + Composition API
 - [TypeScript](https://www.typescriptlang.org/)
