@@ -1,0 +1,19 @@
+{
+  "name": "STEREO VIEWER",
+  "short_name": "StereoViewer",
+  "description": "JPS/PNS立体画像ビューア",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0a0c10",
+  "theme_color": "#00e5ff",
+  "icons": [
+    { "src": "favicon512.svg", "sizes": "512x512" }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/wide.png",
+      "sizes": "1920x1080",
+      "form_factor": "wide"
+    }
+ ]
+}

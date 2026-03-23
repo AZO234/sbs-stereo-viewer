@@ -5,6 +5,8 @@
     <div class="item">FRAME: <span>{{ frame }}</span></div>
     <div class="item">SCALE: <span>{{ scale }}</span></div>
     <div class="item" v-if="layout">LAYOUT: <span>{{ layout }}</span></div>
+    <div class="item" v-if="stretch">STRETCH: <span>{{ stretch }}</span></div>
+    <div class="copy">©AZO</div>
   </div>
 </template>
 
@@ -15,6 +17,7 @@ defineProps<{
   frame: string
   scale: string
   layout?: string
+  stretch?: string
 }>()
 </script>
 
@@ -35,4 +38,5 @@ defineProps<{
 }
 .item { display: flex; gap: 0.4rem; align-items: center; }
 .item span { color: var(--accent); }
+.copy { margin-left: auto; color: var(--text-muted); opacity: 0.5; letter-spacing: 0.05em; }
 </style>

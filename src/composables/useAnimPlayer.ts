@@ -1,5 +1,5 @@
 import { ref, readonly } from 'vue'
-import type { StereoImage } from '../types'
+import type { StereoImage, StretchMode } from '../types'
 
 export function useAnimPlayer() {
   const playing    = ref(false)
@@ -7,19 +7,15 @@ export function useAnimPlayer() {
 
   let rafId      = 0
   let lastSwitch = 0
-
-  // ── クロスフェード用の状態 ──────────────────────────────────
-  // fromEye: フェードアウト中の画像
-  // toEye  : フェードイン中の画像（= currentEye）
-  // t      : 0.0（from が100%表示）→ 1.0（to が100%表示）
   let fromEye: 'left' | 'right' = 'left'
-  let crossT = 1.0   // 1.0 = 切替完了（単画像表示）状態
+  let crossT = 1.0
 
   function start(
     canvas: HTMLCanvasElement,
     stereo: StereoImage,
     getSpeed: () => number,
     getScale: () => number,
+    getStretch: () => StretchMode,
   ) {
     if (playing.value) return
     playing.value = true
@@ -28,34 +24,27 @@ export function useAnimPlayer() {
 
     const loop = (ts: number) => {
       if (!playing.value) return
-
       const speed   = getSpeed()
       const elapsed = ts - lastSwitch
 
       if (elapsed >= speed) {
-        // 前の「to」が次の「from」になる
         fromEye          = currentEye.value
         currentEye.value = currentEye.value === 'left' ? 'right' : 'left'
         lastSwitch = ts
         crossT     = 0.0
       }
 
-      // t: 0 → 1 で線形補間（1 フレーム内に完結）
       crossT = Math.min((ts - lastSwitch) / speed, 1.0)
-
-      crossfadeFrame(canvas, stereo, fromEye, currentEye.value, crossT, getScale())
-
+      crossfadeFrame(canvas, stereo, fromEye, currentEye.value, crossT, getScale(), getStretch())
       rafId = requestAnimationFrame(loop)
     }
-
     rafId = requestAnimationFrame(loop)
   }
 
-  function stop(canvas: HTMLCanvasElement, stereo: StereoImage, scale: number) {
+  function stop(canvas: HTMLCanvasElement, stereo: StereoImage, scale: number, stretch: StretchMode) {
     playing.value = false
     cancelAnimationFrame(rafId)
-    // 停止時は現在の「to」画像を100%で描画
-    drawSingle(canvas, stereo, currentEye.value, scale)
+    drawSingle(canvas, stereo, currentEye.value, scale, stretch)
   }
 
   function toggle(
@@ -63,41 +52,33 @@ export function useAnimPlayer() {
     stereo: StereoImage,
     getSpeed: () => number,
     getScale: () => number,
+    getStretch: () => StretchMode,
   ) {
-    if (playing.value) stop(canvas, stereo, getScale())
-    else               start(canvas, stereo, getSpeed, getScale)
+    if (playing.value) stop(canvas, stereo, getScale(), getStretch())
+    else               start(canvas, stereo, getSpeed, getScale, getStretch)
   }
 
-  function redraw(canvas: HTMLCanvasElement, stereo: StereoImage, scale: number) {
-    if (!playing.value) {
-      drawSingle(canvas, stereo, currentEye.value, scale)
-    }
+  function redraw(canvas: HTMLCanvasElement, stereo: StereoImage, scale: number, stretch: StretchMode) {
+    if (!playing.value) drawSingle(canvas, stereo, currentEye.value, scale, stretch)
   }
 
-  return {
-    playing:    readonly(playing),
-    currentEye: readonly(currentEye),
-    start, stop, toggle, redraw,
-  }
+  return { playing: readonly(playing), currentEye: readonly(currentEye), start, stop, toggle, redraw }
 }
 
-// ── 単画像描画（停止時・リサイズ時） ──────────────────────────
 function drawSingle(
   canvas: HTMLCanvasElement,
   stereo: StereoImage,
   eye: 'left' | 'right',
   scale: number,
+  stretch: StretchMode,
 ) {
-  const { w, h } = canvasSize(stereo, scale)
+  const { w, h } = canvasSize(stereo, scale, stretch)
   resizeIfNeeded(canvas, w, h)
   const ctx = canvas.getContext('2d')!
   ctx.clearRect(0, 0, w, h)
   ctx.drawImage(eye === 'left' ? stereo.left : stereo.right, 0, 0, w, h)
 }
 
-// ── クロスフェード描画 ─────────────────────────────────────────
-// t=0: from が100% / t=1: to が100%
-// 中間は from(1-t) + to(t) の透明度合成
 function crossfadeFrame(
   canvas: HTMLCanvasElement,
   stereo: StereoImage,
@@ -105,44 +86,43 @@ function crossfadeFrame(
   to: 'left' | 'right',
   t: number,
   scale: number,
+  stretch: StretchMode,
 ) {
-  const { w, h } = canvasSize(stereo, scale)
+  const { w, h } = canvasSize(stereo, scale, stretch)
   resizeIfNeeded(canvas, w, h)
   const ctx = canvas.getContext('2d')!
-
   ctx.clearRect(0, 0, w, h)
 
   if (t <= 0) {
-    // フェード開始直前 — from を100%
     ctx.drawImage(from === 'left' ? stereo.left : stereo.right, 0, 0, w, h)
     return
   }
   if (t >= 1) {
-    // フェード完了 — to を100%
     ctx.drawImage(to === 'left' ? stereo.left : stereo.right, 0, 0, w, h)
     return
   }
-
-  // from: (1 - t) の不透明度で描画
   ctx.globalAlpha = 1 - t
   ctx.drawImage(from === 'left' ? stereo.left : stereo.right, 0, 0, w, h)
-
-  // to: t の不透明度で重ねて描画
   ctx.globalAlpha = t
   ctx.drawImage(to === 'left' ? stereo.left : stereo.right, 0, 0, w, h)
-
   ctx.globalAlpha = 1
 }
 
-// ── ユーティリティ ────────────────────────────────────────────
-function canvasSize(stereo: StereoImage, scale: number) {
+/** StretchMode に応じた描画先サイズを計算 */
+export function canvasSize(stereo: StereoImage, scale: number, stretch: StretchMode) {
+  const { halfWidth: hw, height: hh, originalSize: o } = stereo
+  let w: number, h: number
+  switch (stretch) {
+    case 'Wx2': w = o.w; h = o.h; break           // 全幅×全高（元解像度）
+    case 'x1':  w = hw;  h = hh;  break           // 1眼そのまま
+    case 'Hx2': w = o.w; h = o.h; break           // O/U 全高（同上）
+  }
   return {
-    w: Math.round(stereo.equalizedSize.w * scale),
-    h: Math.round(stereo.equalizedSize.h * scale),
+    w: Math.round(w * scale),
+    h: Math.round(h * scale),
   }
 }
 
-/** サイズが変わったときだけ canvas をリセット（毎フレームの不要リセットを防ぐ） */
 function resizeIfNeeded(canvas: HTMLCanvasElement, w: number, h: number) {
   if (canvas.width !== w)  canvas.width  = w
   if (canvas.height !== h) canvas.height = h

@@ -1,8 +1,8 @@
 import { ref } from 'vue'
-import type { StereoImage, StereoLayout } from '../types'
+import type { StereoImage, StereoLayout, StretchMode } from '../types'
 
 export function useStereoLoader() {
-  const stereo = ref<StereoImage | null>(null)
+  const stereo  = ref<StereoImage | null>(null)
   const loading = ref(false)
   const error   = ref<string | null>(null)
 
@@ -19,20 +19,15 @@ export function useStereoLoader() {
           const w = img.width
           const h = img.height
 
-          // --- レイアウト自動判定 ---
-          // 横÷2 と 縦÷2 のどちらが「正方形に近い1眼」かで判断する。
-          // 比率が 1:1 に近い（アスペクト比の差が小さい）方を採用。
-          const rSide      = (w / 2) / h        // Side-by-Side のアスペクト比
-          const rOverUnder = w / (h / 2)        // Over-Under のアスペクト比
-          // 1.0（正方形）に近い、または 16:9 等の横長に近い方を正とする
-          // → 両者の対数差で判定（どちらも等距離なら Side-by-Side を優先）
+          // ── レイアウト自動判定（SBS vs O/U） ──────────────────
+          const rSide      = (w / 2) / h
+          const rOverUnder = w / (h / 2)
           const layout: StereoLayout =
             Math.abs(Math.log(rOverUnder) - Math.log(1.5)) <
             Math.abs(Math.log(rSide)      - Math.log(1.5))
               ? 'over-under'
               : 'side-by-side'
 
-          // Extract both halves via offscreen canvas
           const tmp = document.createElement('canvas')
           tmp.width = w; tmp.height = h
           tmp.getContext('2d')!.drawImage(img, 0, 0)
@@ -54,7 +49,6 @@ export function useStereoLoader() {
             left  = makeHalf(0)
             right = makeHalf(halfWidth)
           } else {
-            // Over-Under: 上が左目、下が右目
             halfWidth  = w
             halfHeight = Math.floor(h / 2)
             const makeHalf = (sy: number): HTMLCanvasElement => {
@@ -67,13 +61,32 @@ export function useStereoLoader() {
             right = makeHalf(halfHeight)
           }
 
+          // ── StretchMode 自動推定 ──────────────────────────────
+          // 1眼のアスペクト比で判断する
+          //   16:9  (≈1.78) → SBS なら Wx2（引き伸ばして全幅）
+          //   32:9  (≈3.56) → SBS なら x1（等倍でちょうど16:9）
+          //   その他縦長系  → Hx2
+          const eyeAspect = halfWidth / halfHeight!
+          let defaultStretch: StretchMode
+          if (layout === 'side-by-side') {
+            if (eyeAspect < 2.5) {
+              // 1眼が縦長〜16:9程度 → 全幅に引き伸ばす
+              defaultStretch = 'Wx2'
+            } else {
+              // 1眼が32:9に近い（ほぼ正方形に近い値） → 等倍
+              defaultStretch = 'x1'
+            }
+          } else {
+            // O/U は全高引き伸ばしが自然
+            defaultStretch = 'Hx2'
+          }
+
           stereo.value = {
             left,
             right,
             halfWidth,
             height: halfHeight!,
-            // 1眼(halfWidth×height)を元の全解像度(w×h)へ引き伸ばして表示
-            equalizedSize: { w, h },
+            defaultStretch,
             fileName: file.name,
             originalSize: { w, h },
             layout,

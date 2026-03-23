@@ -7,9 +7,7 @@
         </span>
         <canvas ref="canvasL" class="eye-canvas" />
       </div>
-
       <div class="divider" />
-
       <div class="eye-frame">
         <span class="eye-label" :class="swapped ? 'left' : 'right'">
           {{ swapped ? 'LEFT → RIGHT' : 'RIGHT' }}
@@ -22,11 +20,13 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
-import type { StereoImage } from '../types'
+import type { StereoImage, StretchMode } from '../types'
+import { canvasSize } from '../composables/useAnimPlayer'
 
 const props = defineProps<{
   stereo: StereoImage
   scale: number
+  stretch: StretchMode
   swapped: boolean
 }>()
 
@@ -34,20 +34,19 @@ const canvasL = ref<HTMLCanvasElement | null>(null)
 const canvasR = ref<HTMLCanvasElement | null>(null)
 
 function draw() {
-  const w = Math.round(props.stereo.equalizedSize.w * props.scale)
-  const h = Math.round(props.stereo.equalizedSize.h * props.scale)
+  const { w, h } = canvasSize(props.stereo, props.scale, props.stretch)
   const L = props.swapped ? props.stereo.right : props.stereo.left
   const R = props.swapped ? props.stereo.left  : props.stereo.right
 
   for (const [canvas, src] of [[canvasL.value, L], [canvasR.value, R]] as const) {
     if (!canvas) continue
-    canvas.width  = w
-    canvas.height = h
+    if (canvas.width !== w)  canvas.width  = w
+    if (canvas.height !== h) canvas.height = h
     canvas.getContext('2d')!.drawImage(src, 0, 0, w, h)
   }
 }
 
-watch([() => props.scale, () => props.swapped, () => props.stereo], draw)
+watch([() => props.scale, () => props.stretch, () => props.swapped, () => props.stereo], draw)
 onMounted(draw)
 </script>
 
@@ -80,7 +79,6 @@ onMounted(draw)
 }
 .eye-label.left  { color: var(--accent); }
 .eye-label.right { color: var(--accent2); }
-
 .eye-canvas {
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -89,7 +87,6 @@ onMounted(draw)
   box-shadow: 0 4px 24px rgba(0,0,0,0.5);
   image-rendering: pixelated;
 }
-
 .divider {
   width: 1px;
   min-height: 80px;
