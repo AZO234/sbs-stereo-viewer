@@ -18,7 +18,7 @@ export async function exportGif(
   const frames = renderCrossfadeFrames(stereo, speed, scale, stretch)
   const first  = frames[0].canvas
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const gif = new GIF({
       workers:      2,
       quality:      10,
