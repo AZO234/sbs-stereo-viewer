@@ -99,7 +99,10 @@ function buildAnimWebp(
   riffView.setUint32(4, totalInner + 4, true)
   riffHeader.set([0x57,0x45,0x42,0x50], 8) // WEBP
 
-  return new Blob([riffHeader, ...chunks], { type: 'image/webp' })
+  // Uint8Array<ArrayBufferLike> → ArrayBuffer に変換して Blob へ渡す
+  // .buffer は ArrayBufferLike なので .slice() で純粋な ArrayBuffer に変換
+  const parts = [riffHeader, ...chunks].map(u8 => u8.buffer.slice(0))
+  return new Blob(parts, { type: 'image/webp' })
 }
 
 function makeChunk(fourcc: string, payload: Uint8Array): Uint8Array {

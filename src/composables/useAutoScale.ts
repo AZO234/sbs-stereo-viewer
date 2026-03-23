@@ -42,7 +42,8 @@ export function useAutoScale(
     const limit = Math.min(maxW, containerW - 32)  // 32px は左右余白
 
     // scale=1 の自然幅
-    const { w: naturalW } = canvasSize(stereo.value, 1.0, stretch.value)
+    const stretchVal: StretchMode = stretch.value ?? 'Wx2'
+    const { w: naturalW } = canvasSize(stereo.value, 1.0, stretchVal)
 
     // 固定式は2枚分
     const totalNatural = mode.value === 'fixed'

@@ -195,7 +195,6 @@ const { autoScale } = useAutoScale(mainEl, stereo, stretchMode, mode)
 // ── Anim controls ─────────────────────────────────────────────
 const animSpeed    = ref(100)
 const animScalePct = ref(100)
-const animScale    = computed(() => animScalePct.value / 100)
 // 自動スケール × 手動スケールを合成
 const finalAnimScale  = computed(() => autoScale.value * animScalePct.value / 100)
 const finalFixedScale = computed(() => autoScale.value * fixedScalePct.value / 100)
@@ -208,7 +207,6 @@ function togglePlay() { animPlaying.value = !animPlaying.value }
 
 // ── Fixed controls ────────────────────────────────────────────
 const fixedScalePct = ref(100)
-const fixedScale    = computed(() => fixedScalePct.value / 100)
 const swapped       = ref(false)
 
 // ── File handler ──────────────────────────────────────────────
