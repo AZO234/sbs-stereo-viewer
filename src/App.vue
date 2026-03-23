@@ -9,13 +9,11 @@
       @update:font-size="fontSize = $event"
     />
     <!-- 右下固定の著作権表示 -->
-    <div class="sv-copyright">
-      ©AZO
-    </div>
+    <div class="sv-copyright">©AZO</div>
 
     <div class="sv-body">
       <!-- ── MAIN（左：画像ビューア） ── -->
-      <main class="sv-main">
+      <main class="sv-main" ref="mainEl">
 
         <div v-if="!stereo && !loading" class="empty-state">
           <div class="empty-icon">🎞️</div>
@@ -34,7 +32,7 @@
             ref="animViewerRef"
             :stereo="stereo"
             :speed="animSpeed"
-            :scale="animScale"
+            :scale="finalAnimScale"
             :stretch="stretchMode"
             v-model:playing="animPlaying"
             @frame="currentFrame = $event"
@@ -42,7 +40,7 @@
           <FixedViewer
             v-show="mode === 'fixed'"
             :stereo="stereo"
-            :scale="fixedScale"
+            :scale="finalFixedScale"
             :stretch="stretchMode"
             :swapped="swapped"
           />
@@ -136,6 +134,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import type { ViewMode, StretchMode } from './types'
+import { useAutoScale } from './composables/useAutoScale'
 import type { FontSize } from './components/FontSizeToggle.vue'
 import { useStereoLoader } from './composables/useStereoLoader'
 
@@ -154,6 +153,9 @@ const isDark = ref(true)
 watch(isDark, (dark) => {
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
 }, { immediate: true })
+
+// ── Main container ref（自動スケール用） ──────────────────────
+const mainEl = ref<HTMLElement | null>(null)
 
 // ── Font size ─────────────────────────────────────────────────
 const fontSize = ref<FontSize>('md')
@@ -187,10 +189,17 @@ const stretchHint = computed(() => {
   }
 })
 
+// ── Auto scale（stretchMode / mode 確定後に初期化） ─────────────
+const { autoScale } = useAutoScale(mainEl, stereo, stretchMode, mode)
+
 // ── Anim controls ─────────────────────────────────────────────
 const animSpeed    = ref(100)
 const animScalePct = ref(100)
 const animScale    = computed(() => animScalePct.value / 100)
+// 自動スケール × 手動スケールを合成
+const finalAnimScale  = computed(() => autoScale.value * animScalePct.value / 100)
+const finalFixedScale = computed(() => autoScale.value * fixedScalePct.value / 100)
+
 const animPlaying  = ref(false)
 const currentFrame = ref<string>('left')
 const animViewerRef = ref<InstanceType<typeof AnimViewer> | null>(null)
@@ -285,19 +294,12 @@ const dimInfo = computed(() => {
   right: 0.8rem;
   font-family: var(--mono);
   font-size: 0.65rem;
-  color: var(--text-muted);
+  color: var(--text);
   opacity: 0.45;
   letter-spacing: 0.08em;
   pointer-events: none;
   z-index: 100;
 }
-
-.sns-bar {
-  display: flex; flex-wrap: wrap; align-items: center;
-  justify-content: center; gap: 0.5rem;
-  padding: 0.4rem 0.5rem; margin-bottom: 0.4rem;
-}
-.sns-bar img { display: block; }
 
 @media (max-width: 768px) {
   .sv-body { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }

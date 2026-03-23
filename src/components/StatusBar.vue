@@ -29,7 +29,7 @@ defineProps<{
   padding: 0.3rem 1.25rem;
   font-family: var(--mono);
   font-size: 0.62rem;
-  color: var(--text);
+  color: var(--text-muted);
   display: flex;
   gap: 2rem;
   letter-spacing: 0.05em;

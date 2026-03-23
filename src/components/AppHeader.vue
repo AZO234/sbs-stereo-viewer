@@ -115,6 +115,13 @@ small {
   font-size: 0.7rem;
   color: var(--text-muted);
 }
+
+.sns-bar {
+  display: flex; flex-wrap: wrap; align-items: center;
+  justify-content: center; gap: 0.5rem;
+  padding: 0.4rem 0.5rem; margin-bottom: 0.4rem;
+}
+.sns-bar img { display: block; }
 .filename { color: var(--text); }
 .sep { opacity: 0.3; }
 .diminfo { color: var(--accent); }
