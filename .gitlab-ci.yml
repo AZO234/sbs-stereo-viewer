@@ -7,6 +7,10 @@
 
 image: node:20-alpine
 
+before_script:
+  - corepack enable
+  - corepack prepare pnpm@9 --activate
+
 # キャッシュ設定（node_modules を再利用して高速化）
 cache:
   key:
@@ -25,8 +29,8 @@ stages:
 build:
   stage: build
   script:
-    - npm ci
-    - npm run build
+    - pnpm install --frozen-lockfile
+    - pnpm run build
   variables:
     # GitLab Pages の公開 URL は
     # https://<GROUP>.gitlab.io/<PROJECT>/ となるため
