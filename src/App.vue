@@ -12,7 +12,7 @@
     />
     <!-- 右下固定の著作権表示 -->
     <div class="sv-copyright">
-      <a href="https://domisan.sakura.ne.jp/"><img src="https://domisan.sakura.ne.jp/banner.png" width=”150” target="_blank" /></a><br />
+      <a href="https://domisan.sakura.ne.jp/" target="_blank"><img src="https://domisan.sakura.ne.jp/banner.png" width=”150” /></a><br />
       ©AZO
     </div>
 
