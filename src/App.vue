@@ -12,8 +12,10 @@
     />
     <!-- 右下固定の著作権表示 -->
     <div class="sv-copyright">
-      <a href="https://domisan.sakura.ne.jp/" target="_blank"><img src="https://domisan.sakura.ne.jp/banner.png" width=”150” /></a><br />
-      ©AZO
+      <a href="https://domisan.sakura.ne.jp/" target="_blank" class="sv-copyright__banner">
+        <img src="https://domisan.sakura.ne.jp/banner.png" width="150" />
+      </a>
+      <div class="sv-copyright__text">©AZO</div>
     </div>
 
     <div class="sv-body">
@@ -327,6 +329,19 @@ const dimInfo = computed(() => {
   letter-spacing: 0.08em;
   pointer-events: none;
   z-index: 100;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+}
+.sv-copyright__banner {
+  pointer-events: auto;
+  display: block;
+  line-height: 0;
+}
+.sv-copyright__text {
+  pointer-events: none;
 }
 
 @media (max-width: 768px) {
