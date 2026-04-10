@@ -5,8 +5,8 @@
         <span /><span /><span /><span />
       </div>
       <div class="logo-text">
-        <h1>STEREO VIEWER</h1>
-        <small>JPS / PNS STEREOSCOPIC IMAGE BROWSER</small>
+        <h1>SBS STEREO VIEWER</h1>
+        <small>SIDE-BY-SIDE STEREOSCOPIC 3D IMAGE BROWSER</small>
       </div>
       <div class="sns-bar">
         <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">ポスト</a>

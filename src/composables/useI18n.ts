@@ -76,7 +76,7 @@ const messages = {
     // ヘルプモーダル
     helpTitle:    'HOW TO USE',
     helpSrcLabel: 'SOURCE IMAGE (SBS)',
-    helpSrcHint:  'サイドバイサイド形式の元画像です。スライダーで左眼（L）と右眼（R）を比較できます。',
+    helpSrcHint:  'サイドバイサイド形式の元画像です。',
     helpGifLabel: 'GENERATED ANIMATION',
     helpGifHint:  'このビューアで生成したクロスフェードアニメです（GIF）。',
     helpBtn:      '使い方',
@@ -145,7 +145,7 @@ const messages = {
     // Help modal
     helpTitle:    'HOW TO USE',
     helpSrcLabel: 'SOURCE IMAGE (SBS)',
-    helpSrcHint:  'Side-by-side stereo image. Drag the slider to compare Left (L) and Right (R) eyes.',
+    helpSrcHint:  'Side-by-side stereo image.',
     helpGifLabel: 'GENERATED ANIMATION',
     helpGifHint:  'Crossfade animation exported from this viewer (GIF).',
     helpBtn:      'How to use',
